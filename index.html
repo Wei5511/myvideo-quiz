@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyVideo 全方位影音測驗</title>
+    <style>
+        /* --- CSS MyVideo 深色質感主題 --- */
+        :root {
+            --mv-orange: #ff7300;
+            --mv-bg: #0d0d0d;
+            --mv-card: #1f1f1f;
+            --mv-card-hover: #2a2a2a;
+            --text-main: #ffffff;
+            --text-sub: #bbbbbb;
+        }
+
+        body {
+            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
+            background-color: var(--mv-bg);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* 改為靠上對齊，因為內容變長了 */
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px; /* 增加上下留白 */
+            background-image: radial-gradient(circle at top, #1a1a1a 0%, #000000 100%);
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: var(--mv-card);
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            max-width: 600px; /*稍微加寬 */
+            width: 100%;
+            text-align: center;
+            border-top: 5px solid var(--mv-orange);
+            position: relative;
+        }
+
+        /* --- 純 CSS LOGO --- */
+        .logo-text {
+            font-family: Arial, sans-serif;
+            font-weight: 900;
+            font-size: 42px;
+            color: var(--mv-orange);
+            letter-spacing: -1px;
+            margin-bottom: 5px;
+            display: inline-block;
+        }
+        .logo-slogan {
+            font-size: 12px;
+            color: #666;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            margin-bottom: 25px;
+            font-size: 24px;
+            color: var(--text-main);
+            font-weight: bold;
+            line-height: 1.4;
+        }
+
+        p {
+            color: var(--text-sub);
+            line-height: 1.6;
+            margin-bottom: 35px;
+            font-size: 15px;
+        }
+
+        /* 進度條 */
+        .progress-bar {
+            height: 4px;
+            background-color: #333;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: var(--mv-orange);
+            width: 0%;
+            transition: width 0.4s ease;
+            box-shadow: 0 0 15px var(--mv-orange);
+        }
+
+        /* 選項按鈕 */
+        .btn {
+            background-color: transparent;
+            border: 1px solid #555;
+            color: var(--text-sub);
+            padding: 16px 20px;
+            margin: 12px 0;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            display: block;
+            text-align: left;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .btn:hover {
+            border-color: var(--mv-orange);
+            color: var(--mv-orange);
+            background-color: rgba(255, 115, 0, 0.05);
+            padding-left: 25px;
+        }
+        
+        .btn-primary {
+            background-color: var(--mv-orange);
+            border: none;
+            color: #fff;
+            font-weight: bold;
+            text-align: center;
+            font-size: 18px;
+            border-radius: 50px;
+        }
+        .btn-primary:hover {
+            background-color: #ff8c33;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 115, 0, 0.4);
+            color: #fff;
+            padding-left: 20px;
+        }
+
+        /* --- 結果頁樣式優化 --- */
+        .result-section {
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        .section-title {
+            color: var(--text-main);
+            font-size: 18px;
+            border-left: 4px solid var(--mv-orange);
+            padding-left: 10px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .recommendation-card {
+            background-color: #252525;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        .recommendation-card:hover {
+            background-color: #333;
+            transform: translateX(3px);
+        }
+
+        .rec-info { flex: 1; padding-right: 10px; }
+        .rec-info h3 { margin: 0 0 4px 0; color: var(--mv-orange); font-size: 16px; }
+        .rec-info p { color: #888; margin: 0; font-size: 12px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
+        
+        .rec-link {
+            background-color: transparent;
+            border: 1px solid #666;
+            color: #ccc;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .rec-link:hover {
+            border-color: var(--mv-orange);
+            color: var(--mv-orange);
+        }
+
+        .hidden { display: none; }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="container fade-in">
+    <div>
+        <div class="logo-text">MyVideo</div>
+        <div class="logo-slogan">全方位觀影指南</div>
+    </div>
+
+    <div id="screen-start">
+        <h2>潛意識觀影測驗</h2>
+        <p>你的選擇反映了你的內心渴望。<br>透過情境分析，<br>為您量身打造電影、戲劇與動漫片單。</p>
+        <button class="btn btn-primary" onclick="startQuiz()">開始潛意識連結</button>
+    </div>
+
+    <div id="screen-quiz" class="hidden">
+        <div class="progress-bar">
+            <div id="progress-fill" class="progress-fill"></div>
+        </div>
+        <h2 id="question-text">題目載入中...</h2>
+        <div id="options-area"></div>
+    </div>
+
+    <div id="screen-result" class="hidden">
+        <h2 style="color: var(--mv-orange);">✨ 您的專屬推薦</h2>
+        <p id="result-desc" style="font-size: 14px; margin-bottom: 20px;"></p>
+        
+        <div id="list-movie" class="result-section"></div>
+        <div id="list-drama" class="result-section"></div>
+        <div id="list-anime" class="result-section"></div>
+
+        <button class="btn" style="border-color: #444; color: #777; margin-top:30px; text-align: center;" onclick="restart()">🔄 重新測驗</button>
+    </div>
+</div>
+
+<script>
+    /* --- 資料設定 --- */
+    var allQuestions = [
+        { q: "在一個重複的夢境中，你發現自己總是站在...", opts: [ {t:"懸崖邊緣，準備展翅飛翔", tag:"action"}, {t:"熱鬧的市集，被人群與笑聲包圍", tag:"comedy"}, {t:"充滿迷霧的古老圖書館", tag:"thriller"}, {t:"夕陽下的海邊，等待某人歸來", tag:"romance"} ] },
+        { q: "如果世界剩下最後 24 小時，你會選擇？", opts: [ {t:"去完成那件一直不敢做的瘋狂事", tag:"action"}, {t:"和家人朋友開一場最後的派對", tag:"comedy"}, {t:"靜靜地寫下這一生的回憶錄", tag:"drama"}, {t:"向那個藏在心底的人告白", tag:"romance"} ] },
+        { q: "你走進一個沒人看守的房間，桌上有一本書，書名是？", opts: [ {t:"《毀滅與重生的法則》", tag:"action"}, {t:"《關於那些荒謬的日常》", tag:"comedy"}, {t:"《無法被解開的謎題》", tag:"thriller"}, {t:"《遺憾與寬恕》", tag:"drama"} ] },
+        { q: "朋友形容你是個怎麼樣的人？", opts: [ {t:"總是衝動行事，停不下來", tag:"action"}, {t:"大家的開心果，有你在就不冷場", tag:"comedy"}, {t:"心思細膩，總是想得很多", tag:"drama"}, {t:"直覺敏銳，很會觀察細節", tag:"thriller"} ] },
+        { q: "現在的你，覺得心靈最缺乏什麼？", opts: [ {t:"一場能夠宣洩的大哭", tag:"drama"}, {t:"不需要動腦的單純快樂", tag:"comedy"}, {t:"讓心跳加速的激情", tag:"romance"}, {t:"打破現狀的勇氣", tag:"action"} ] },
+        { q: "深夜打開冰箱，你會拿什麼出來吃？", opts: [ {t:"極度辛辣的食物", tag:"action"}, {t:"甜滋滋的蛋糕甜點", tag:"romance"}, {t:"隨便剩菜熱一下就好", tag:"drama"}, {t:"奇怪的實驗性料理", tag:"thriller"} ] }
+    ];
+
+    /* --- 資料庫：增加 category (movie/drama/anime) --- */
+    var database = [
+        // --- MOVIE 電影 ---
+        { category: "movie", title: "捍衛戰士：獨行俠", tags: ["action"], desc: "湯姆克魯斯生涯顛峰" },
+        { category: "movie", title: "玩命關頭X", tags: ["action"], desc: "家人俠拯救世界" },
+        { category: "movie", title: "不可能的任務：致命清算", tags: ["action", "thriller"], desc: "特務動作片教科書" },
+        { category: "movie", title: "關於我和鬼變成家人的那件事", tags: ["comedy", "action"], desc: "許光漢x林柏宏，笑淚交織" },
+        { category: "movie", title: "超級瑪利歐兄弟", tags: ["comedy"], desc: "經典遊戲改編回憶殺" },
+        { category: "movie", title: "芭比 Barbie", tags: ["comedy", "drama"], desc: "粉紅風暴席捲全球" },
+        { category: "movie", title: "奧本海默", tags: ["drama", "thriller"], desc: "原子彈之父的傳記" },
+        { category: "movie", title: "做工的人 電影版", tags: ["drama", "comedy"], desc: "獻給勞動者的感人詩篇" },
+        { category: "movie", title: "周處除三害", tags: ["thriller", "action"], desc: "阮經天演技爆發" },
+        { category: "movie", title: "想見你 電影版", tags: ["romance", "thriller"], desc: "鳳南小隊再次穿越" },
+        { category: "movie", title: "樂來樂愛你", tags: ["romance", "drama"], desc: "獻給追夢人的愛情樂章" },
+        { category: "movie", title: "沙丘：第二部", tags: ["action", "drama"], desc: "史詩級科幻鉅作" },
+
+        // --- DRAMA 戲劇 ---
+        { category: "drama", title: "不夠善良的我們", tags: ["drama", "romance"], desc: "林依晨x許瑋甯話題之作" },
+        { category: "drama", title: "人選之人-造浪者", tags: ["drama"], desc: "台灣首部幕僚職人劇" },
+        { category: "drama", title: "八尺門的辯護人", tags: ["drama", "thriller"], desc: "法律與族群深度議題" },
+        { category: "drama", title: "非殺人小說", tags: ["thriller"], desc: "劉冠廷主演，反轉再反轉" },
+        { category: "drama", title: "最佳利益", tags: ["drama"], desc: "台灣律政職人劇" },
+        { category: "drama", title: "我的女神室友斗娜", tags: ["romance"], desc: "韓劇浪漫天花板" },
+        { category: "drama", title: "少年謝爾頓", tags: ["comedy"], desc: "宅男行不行爆笑前傳" },
+        { category: "drama", title: "Friends 六人行", tags: ["comedy", "romance"], desc: "美劇經典輕鬆解壓" },
+        { category: "drama", title: "模仿犯", tags: ["thriller"], desc: "宮部美幸經典改編" },
+        { category: "drama", title: "商魂", tags: ["drama"], desc: "台灣第一代實業家故事" },
+
+        // --- ANIME 動漫 ---
+        { category: "anime", title: "葬送的芙莉蓮", tags: ["drama"], desc: "探討生命與時間的神作" },
+        { category: "anime", title: "SPY×FAMILY 間諜家家酒", tags: ["comedy", "action"], desc: "安妮亞喜歡這個！" },
+        { category: "anime", title: "進擊的巨人", tags: ["thriller", "action"], desc: "動漫史上的史詩級完結" },
+        { category: "anime", title: "鬼滅之刃", tags: ["action"], desc: "華麗戰鬥熱血巔峰" },
+        { category: "anime", title: "咒術迴戰", tags: ["action", "thriller"], desc: "特級咒術師的戰鬥" },
+        { category: "anime", title: "我推的孩子", tags: ["thriller", "drama"], desc: "揭開演藝圈黑暗面" },
+        { category: "anime", title: "肌肉魔法使", tags: ["comedy", "action"], desc: "物理魔法爆笑番" },
+        { category: "anime", title: "排球少年", tags: ["action", "drama"], desc: "熱血運動神作" },
+        { category: "anime", title: "輝夜姬想讓人告白", tags: ["romance", "comedy"], desc: "天才們的戀愛頭腦戰" },
+        { category: "anime", title: "名偵探柯南", tags: ["thriller"], desc: "真相永遠只有一個" }
+    ];
+
+    var currentQuiz = [];
+    var qIndex = 0;
+    var scores = { action: 0, comedy: 0, drama: 0, thriller: 0, romance: 0 };
+
+    /* --- 核心邏輯 --- */
+    function startQuiz() {
+        qIndex = 0;
+        scores = { action: 0, comedy: 0, drama: 0, thriller: 0, romance: 0 };
+        var pool = allQuestions.slice(); 
+        pool.sort(function() { return 0.5 - Math.random(); }); 
+        currentQuiz = pool.slice(0, 5);
+        showScreen('screen-quiz');
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        var percent = (qIndex / 5) * 100;
+        document.getElementById('progress-fill').style.width = percent + "%";
+        if (qIndex >= 5) {
+            finishQuiz();
+            return;
+        }
+        var qData = currentQuiz[qIndex];
+        document.getElementById('question-text').innerText = qData.q;
+        var area = document.getElementById('options-area');
+        area.innerHTML = ""; 
+        var opts = qData.opts.slice();
+        opts.sort(function() { return 0.5 - Math.random(); });
+        for (var i = 0; i < opts.length; i++) {
+            (function(opt) {
+                var btn = document.createElement('button');
+                btn.className = "btn fade-in";
+                btn.style.animationDelay = (i * 0.1) + "s";
+                btn.innerText = opt.t;
+                btn.onclick = function() { 
+                    scores[opt.tag]++;
+                    qIndex++;
+                    renderQuestion();
+                };
+                area.appendChild(btn);
+            })(opts[i]);
+        }
+    }
+
+    function finishQuiz() {
+        document.getElementById('progress-fill').style.width = "100%";
+        showScreen('screen-result');
+
+        // 計算最高分標籤
+        var max = -1;
+        var winTag = "comedy"; 
+        for (var key in scores) {
+            if (scores[key] > max) {
+                max = scores[key];
+                winTag = key;
+            }
+        }
+
+        // 產生文案
+        var textMap = {
+            "action": "你的靈魂渴望突破！為你推薦熱血與刺激的內容：",
+            "comedy": "你需要一些快樂多巴胺！這些作品能讓你放鬆大笑：",
+            "drama": "你更在意故事的靈魂。請細細品味這些深度佳作：",
+            "thriller": "你喜歡挑戰思維極限。這些燒腦內容絕對適合你：",
+            "romance": "內心柔軟的時刻，讓這些動人的故事溫暖你的心："
+        };
+        document.getElementById('result-desc').innerText = textMap[winTag] || textMap["comedy"];
+
+        // --- 分類推薦邏輯 ---
+        renderSection("movie", "🎬 熱門電影", winTag);
+        renderSection("drama", "📺 精選戲劇", winTag);
+        renderSection("anime", "⚔️ 必看動漫", winTag);
+    }
+
+    // 渲染單一區塊 (類別, 標題, 用戶喜好標籤)
+    function renderSection(category, title, userTag) {
+        var container = document.getElementById("list-" + category);
+        container.innerHTML = "<div class='section-title'>" + title + "</div>";
+
+        // 1. 先篩選出該類別的所有影片
+        var allInCategory = database.filter(function(item) {
+            return item.category === category;
+        });
+
+        // 2. 排序：如果影片標籤包含用戶喜好(userTag)，排前面；否則隨機
+        allInCategory.sort(function(a, b) {
+            var aHasTag = a.tags.indexOf(userTag) > -1 ? 1 : 0;
+            var bHasTag = b.tags.indexOf(userTag) > -1 ? 1 : 0;
+            // 優先權高者排前 (return 負數)
+            if (aHasTag > bHasTag) return -1;
+            if (aHasTag < bHasTag) return 1;
+            return 0.5 - Math.random(); // 若優先權相同，則隨機
+        });
+
+        // 3. 取前 3 部
+        var top3 = allInCategory.slice(0, 3);
+
+        // 4. 產生 HTML
+        for (var i = 0; i < top3.length; i++) {
+            var item = top3[i];
+            var searchUrl = "https://www.myvideo.net.tw/search/" + encodeURIComponent(item.title);
+            
+            var div = document.createElement('div');
+            div.className = "recommendation-card fade-in";
+            div.style.animationDelay = (i * 0.1) + "s";
+            div.innerHTML = 
+                '<div class="rec-info">' +
+                    '<h3>' + item.title + '</h3>' +
+                    '<p>' + item.desc + '</p>' +
+                '</div>' +
+                '<a href="' + searchUrl + '" target="_blank" class="rec-link">觀看 ▶</a>';
+            container.appendChild(div);
+        }
+    }
+
+    function restart() {
+        showScreen('screen-start');
+        document.getElementById('progress-fill').style.width = "0%";
+    }
+
+    function showScreen(id) {
+        document.getElementById('screen-start').className = "hidden";
+        document.getElementById('screen-quiz').className = "hidden";
+        document.getElementById('screen-result').className = "hidden";
+        document.getElementById(id).className = "fade-in"; 
+    }
+</script>
+
+</body>
+</html>
